@@ -1,0 +1,139 @@
+一：数据按二机制包传送，格式为：包长+包内容，如下：
+   -------------------------------------
+   | 2个字节的包长度(网络序:bigEndian) |
+   -------------------------------------
+   | 上述长度的包内容(littleEndian)    |
+   -------------------------------------
+
+   包内容的格式：
+   -------------------------
+   | 2个字节的命令(Opcode) |
+   -------------------------
+   | 随命令变化的内容      |
+   -------------------------
+
+二：Opcodes
+    解释：CMSG开头的是client->server
+          SMSG开头的是server->client
+          字符串为UTF8编码，格式为：2个字节的长度+字符串内容
+
+1.CMSG_PING
+   客户端定期向服务器发送心跳命令
+   uint32 ping;    --序列号，客户端可以通过index++来产生
+   uint32 latency; --延迟时间
+
+2.SMSG_PONG
+   服务器对PING的响应
+   uint32 ping;    --通过CMSG_PING拿到
+
+3.CMSG_LOGIN
+   客户端登录
+   string host;         --服务器域名，正式服不要填ip,类似于http header中的host，用于以后的合服用.
+   uint32 accountId;    --帐号id
+   uint32 charId;       --角色id
+   string key;          --密码
+
+4.SMSG_LOGIN
+   服务器对登录的响应
+   uint8  result;    --成功为0，否则错误(如果错误，没有下面的数据)
+   uint32 unixtime;  --服务器当前时间(从1970年后的秒数)
+   uint32 key;       --加密用的key, 最终的加密key为: unixtime+key
+
+5.SMSG_LOGOUT
+   退出游戏
+   uint16 result;
+
+6.SMSG_RESULT
+   通用消息：cmd对应的命令是否成功
+   uint16 cmd;          --客户端发出的命令
+   uint16 result;       --0成功，否则失败
+   uint8  hasLocation;  --是否有坐标
+   --如果hasLocation不为0,则有坐标字段
+   uint16 x;
+   uint16 y;
+   
+7.CMSG_MOVE
+    精灵移动
+    uint16  startx;    --移动之前坐标
+    uint16  starty;    --移动之前坐标
+	uint32  roleId;    --单位(精灵)id
+    uint8   steps;     --移动几步
+    uint8   dir;       --方向：0上 1下 2左 3右
+	
+8.SMSG_MOVE
+    精灵移动
+    uint16  startx;    --移动之前坐标
+    uint16  starty;    --移动之前坐标
+	uint32  roleId;    --单位(精灵)id
+    uint8   steps;     --移动几步
+    uint8   dir;       --方向：0上 1下 2左 3右
+	
+9.SMSG_ROOM_LIST
+	房间列表，登陆成功以后服务端主动下发
+	uint16 roomSum		--房间总数
+	uint16 roomId		--房间id
+	uint8  maxCount		--房间能容纳总人数
+	uint8  enterCount	--已进入该房间的人数
+	...					
+	
+10.CMSG_ROOM_CREATE
+	创建房间
+	uint16 mapId		--地图id
+	uint8  maxCount		--房间能容纳总人数
+	
+11.CMSG_ROOM_ENTER
+	进入房间
+	uint16 roomId
+	
+12.SMSG_ROOM_INFO
+	房间内详细信息
+	uint16 roomId		--房间id
+	uint16 mapId		--地图id
+	uint8  maxCount		--房间能容纳总人数
+	uint8  enterCount	--已进入该房间的人数
+	uint32 accountId	--玩家id
+	string accountName	--玩家name
+	uint8  ready		--玩家是否已准备,0没准备 1已准备
+	...
+	
+13.CMSG_ROOM_READY
+	等待/取消等待
+	uint8  ready		--0取消准备 1准备
+
+14.CMSG_ROOM_LEAVE
+	离开房间
+	uint16 roomId
+	
+15.SMSG_ROOM_LEAVE
+	离开房间
+	uint16 roomId
+	
+16.SMSG_MAP_ENTER
+	进入地图
+	uint16 mapId		--地图id
+	uint16 roleId		--在地图上的角色id
+	
+17.CMSG_BOMB_BORN
+	丢炸弹
+	uint16 x
+	uint16 y
+	
+18.SMSG_BOMB_BORN
+	丢炸弹
+	uint16 x
+	uint16 y
+	
+19.SMSG_BOMB_EXPLODE
+	炸弹爆炸,客户端自己拆墙
+	uint16 x
+	uint16 y
+	uint8 radius	--爆炸半径
+	
+20.SMSG_ROLE_DEAD
+	角色被炸死
+	uint8  count	--被炸死的个数
+	uint16 role
+	...
+	
+21.SMSG_GAME_OVER
+	uint8 win		--0失败 1胜利
