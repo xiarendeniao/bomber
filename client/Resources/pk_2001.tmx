@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="41" height="20" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="tilemap" tilewidth="16" tileheight="16">
+  <image source="tilemap.png" width="32" height="16"/>
+ </tileset>
+ <layer name="Tiles1" width="41" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC9VW0QrAIAis/v+j9xQcknpnMrZAbGaybue1OcaYP7BsLDLnZJW6Czy+Y+QXmafme3k2vmPRYHHBfGZ/hOM2i2N2/uzcKt6sRz5W+cOuqwNx7OZPN57Ixy4csn7F50wL2L72vIq/ynfbM/Z8Jx/lKX1va0R97+HI8i5bv9VVBkd1VPXTrkX6eOtv9cHzij7uHJan3l7lO7E4duldxlev/y2OzL1a1VO2Ls7fxjGrx+KI8wp/mH9IL3aK4134VZs/sQdgCzjR0AwAAA==
+  </data>
+ </layer>
+ <objectgroup name="Objects1" width="41" height="20">
+  <object name="man" x="16" y="16" width="16" height="16">
+   <properties>
+    <property name="roleId" value="1"/>
+   </properties>
+  </object>
+  <object name="man" x="256" y="16" width="16" height="16">
+   <properties>
+    <property name="roleId" value="2"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
