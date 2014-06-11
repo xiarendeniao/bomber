@@ -127,7 +127,8 @@ class Session(object):
             else:
                 getattr(self, opcodeStr)(Package(opcode, self.pkg_data[OPCODE_LEN:self.pkg_size]))
         #重置数据接收区域
-        self.pkg_data = ''
+        #self.pkg_data = ''
+        self.pkg_data = self.pkg_data[self.pkg_size:]
         self.pkg_size = None
         
     def CMSG_ROOM_CREATE(self, pkg):
